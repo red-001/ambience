@@ -1,5 +1,5 @@
 
---= Ambience lite by TenPlus1 (26th February 2016)
+--= Ambience lite by TenPlus1 (3rd March 2016)
 
 local max_frequency_all = 1000 -- larger number means more frequent sounds (100-2000)
 local SOUNDVOLUME = 1
@@ -143,22 +143,22 @@ local get_ambience = function(player)
 			"default:desert_sand", "default:desert_stone", "default:snowblock"
 		})
 
-	local num_fire = cn["fire:basic_flame"] + cn["fire:permanent_flame"]
-	local num_lava = cn["default:lava_flowing"] + cn["default:lava_source"]
-	local num_water_flowing = cn["default:water_flowing"] + cn["default:river_water_flowing"]
-	local num_water_source = cn["default:water_source"] + cn["default:river_water_flowing"]
-	local num_desert = cn["default:desert_sand"] + cn["default:desert_stone"]
-	local num_snow = cn["default:snowblock"]
-
---[[print (
+	local num_fire = (cn["fire:basic_flame"] or 0) + (cn["fire:permanent_flame"] or 0)
+	local num_lava = (cn["default:lava_flowing"] or 0) + (cn["default:lava_source"] or 0)
+	local num_water_flowing = (cn["default:water_flowing"] or 0) + (cn["default:river_water_flowing"] or 0)
+	local num_water_source = (cn["default:water_source"] or 0) + (cn["default:river_water_flowing"] or 0)
+	local num_desert = (cn["default:desert_sand"] or 0) + (cn["default:desert_stone"] or 0)
+	local num_snow = (cn["default:snowblock"] or 0)
+--[[
+print (
 	"fr:" .. num_fire,
 	"lv:" .. num_lava,
 	"wf:" .. num_water_flowing,
 	"ws:" .. num_water_source,
 	"ds:" .. num_desert,
 	"sn:" .. num_snow
-)]]
-
+)
+]]
 	-- is fire redo mod active?
 	if fire and fire.mod and fire.mod == "redo" then
 
