@@ -1,5 +1,5 @@
 
---= Ambience lite by TenPlus1 (3rd March 2016)
+--= Ambience lite by TenPlus1 (1st April 2016)
 
 local max_frequency_all = 1000 -- larger number means more frequent sounds (100-2000)
 local SOUNDVOLUME = 1
@@ -10,101 +10,95 @@ local played_on_start = false
 -- sound sets
 local night = {
 	handler = {}, frequency = 40,
-	{name="hornedowl", length = 2},
-	{name="wolves", length = 4},
-	{name="cricket", length = 6},
-	{name="deer", length = 7},
-	{name="frog", length = 1},
+	{name = "hornedowl", length = 2},
+	{name = "wolves", length = 4},
+	{name = "cricket", length = 6},
+	{name = "deer", length = 7},
+	{name = "frog", length = 1},
 }
 
 local day = {
 	handler = {}, frequency = 40,
-	{name="cardinal", length = 3},
-	{name="craw", length = 3},
-	{name="bluejay", length = 6},
-	{name="canadianloon2", length = 14},
-	{name="robin", length = 4},
-	{name="bird1", length = 11},
-	{name="bird2", length = 6},
-	{name="crestedlark", length = 6},
-	{name="peacock", length = 2}
+	{name = "cardinal", length = 3},
+	{name = "craw", length = 3},
+	{name = "bluejay", length = 6},
+	{name = "robin", length = 4},
+	{name = "bird1", length = 11},
+	{name = "bird2", length = 6},
+	{name = "crestedlark", length = 6},
+	{name = "peacock", length = 2},
+	{name = "wind", length = 9},
 }
 
 local high_up = {
 	handler = {}, frequency = 40,
-	{name="desertwind", length = 8},
+	{name = "desertwind", length = 8},
+	{name = "wind", length = 9},
 }
 
 local cave = {
 	handler = {}, frequency = 60,
-	{name="drippingwater1", length = 1.5},
-	{name="drippingwater2", length = 1.5}
+	{name = "drippingwater1", length = 1.5},
+	{name = "drippingwater2", length = 1.5}
 }
 
 local beach = {
 	handler = {}, frequency = 40,
-	{name="seagull", length = 4.5},
-	{name="beach", length = 13},
-	{name="gull", length = 1}
+	{name = "seagull", length = 4.5},
+	{name = "beach", length = 13},
+	{name = "gull", length = 1}
 }
 
 local desert = {
 	handler = {}, frequency = 20,
-	{name="coyote", length = 2.5},
-	{name="desertwind", length = 8}
+	{name = "coyote", length = 2.5},
+	{name = "desertwind", length = 8}
 }
 
 local flowing_water = {
 	handler = {}, frequency = 1000,
-	{name="waterfall", length = 6}
+	{name = "waterfall", length = 6}
 }
 
 local underwater = {
 	handler = {}, frequency = 1000,
-	{name="scuba", length = 8}
+	{name = "scuba", length = 8}
 }
 
 local splash = {
 	handler = {}, frequency = 1000,
-	{name="swim_splashing",	length=3},
+	{name = "swim_splashing", length=3},
 }
 
 local lava = {
 	handler = {}, frequency = 1000,
-	{name="lava", length = 7}
+	{name = "lava", length = 7}
 }
 
 local smallfire = {
 	handler = {}, frequency = 1000,
-	{name="fire_small", length = 6}
+	{name = "fire_small", length = 6}
 }
 
 local largefire = {
 	handler = {}, frequency = 1000,
-	{name="fire_large", length = 8}
+	{name = "fire_large", length = 8}
+}
+
+local jungle = {
+	handler = {}, frequency = 60,
+	{name = "jungle", length = 4},
+	{name = "deer", length = 7},
+	{name = "canadianloon2", length = 14},
+	{name = "bird1", length = 11},
+	{name = "bird2", length = 6},
+	{name = "peacock", length = 2},
+	{name = "bluejay", length = 6},
 }
 
 local radius = 6
-
--- get node but use fallback for nil or unknown
-local function node_ok(pos, fallback)
-
-	fallback = fallback or "default:dirt"
-
-	local node = minetest.get_node_or_nil(pos)
-
-	if not node then
-		return fallback
-	end
-
-	local nodef = minetest.registered_nodes[node.name]
-
-	if nodef then
-		return node.name
-	end
-
-	return fallback
-end
+local num_fire, num_lava, num_water_flowing, num_water_source,
+	num_desert, num_snow, num_jungletree
 
 -- check where player is and which sounds are played
 local get_ambience = function(player)
@@ -115,20 +109,20 @@ local get_ambience = function(player)
 
 	-- what is around me?
 	pos.y = pos.y + 1.4 -- head level
-	local nod_head = node_ok(pos, "air")
+	local nod_head = minetest.get_node(pos).name
 
 	pos.y = pos.y - 1.2 -- foot level
-	local nod_feet = node_ok(pos, "air")
+	local nod_feet = minetest.get_node(pos).name
 
 	pos.y = pos.y - 0.2 -- reset pos
 
 --= START Ambiance
 
-	if minetest.registered_nodes[nod_head].groups.water then
+	if minetest.get_item_group(nod_head, "water") > 0 then
 		return {underwater = underwater}
 	end
 
-	if minetest.registered_nodes[nod_feet].groups.water then
+	if minetest.get_item_group(nod_feet, "water") > 0 then
 		return {splash = splash}
 	end
 
@@ -137,18 +131,19 @@ local get_ambience = function(player)
 		{x = pos.x + radius, y = pos.y + radius, z = pos.z + radius},
 		{
 			"fire:basic_flame", "fire:permanent_flame",
-			"default:lava_flowing", "default:lava_source",
+			"default:lava_flowing", "default:lava_source", "default:jungletree",
 			"default:water_flowing", "default:water_source",
 			"default:river_water_flowing", "default:river_water_source",
 			"default:desert_sand", "default:desert_stone", "default:snowblock"
 		})
 
-	local num_fire = (cn["fire:basic_flame"] or 0) + (cn["fire:permanent_flame"] or 0)
-	local num_lava = (cn["default:lava_flowing"] or 0) + (cn["default:lava_source"] or 0)
-	local num_water_flowing = (cn["default:water_flowing"] or 0) + (cn["default:river_water_flowing"] or 0)
-	local num_water_source = (cn["default:water_source"] or 0) + (cn["default:river_water_flowing"] or 0)
-	local num_desert = (cn["default:desert_sand"] or 0) + (cn["default:desert_stone"] or 0)
-	local num_snow = (cn["default:snowblock"] or 0)
+	num_fire = (cn["fire:basic_flame"] or 0) + (cn["fire:permanent_flame"] or 0)
+	num_lava = (cn["default:lava_flowing"] or 0) + (cn["default:lava_source"] or 0)
+	num_water_flowing = (cn["default:water_flowing"] or 0) + (cn["default:river_water_flowing"] or 0)
+	num_water_source = (cn["default:water_source"] or 0) + (cn["default:river_water_flowing"] or 0)
+	num_desert = (cn["default:desert_sand"] or 0) + (cn["default:desert_stone"] or 0)
+	num_snow = (cn["default:snowblock"] or 0)
+	num_jungletree = (cn["default:jungletree"] or 0)
 --[[
 print (
 	"fr:" .. num_fire,
@@ -156,7 +151,8 @@ print (
 	"wf:" .. num_water_flowing,
 	"ws:" .. num_water_source,
 	"ds:" .. num_desert,
-	"sn:" .. num_snow
+	"sn:" .. num_snow,
+	"jt:" .. num_jungletree
 )
 ]]
 	-- is fire redo mod active?
@@ -200,6 +196,11 @@ print (
 
 	if tod > 0.2
 	and tod < 0.8 then
+
+		if num_jungletree > 100 then
+			return {jungle = jungle}
+		end
+
 		return {day = day}
 	else
 		return {night = night}
@@ -270,6 +271,7 @@ local still_playing = function(still_playing, player_name)
 	if not still_playing.lava then stop_sound(lava, player_name) end
 	if not still_playing.smallfire then stop_sound(smallfire, player_name) end
 	if not still_playing.largefire then stop_sound(largefire, player_name) end
+	if not still_playing.jungle then stop_sound(jungle, player_name) end
 end
 
 -- player routine
