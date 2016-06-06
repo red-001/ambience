@@ -207,14 +207,14 @@ print (
 	if tod > 0.2
 	and tod < 0.8 then
 
-		if num_jungletree > 100 then
+		if num_jungletree > 90 then
 			return {jungle = jungle}
 		end
 
 		return {day = day}
 	else
 
-		if num_jungletree > 100 then
+		if num_jungletree > 90 then
 			return {jungle_night = jungle_night}
 		end
 
