@@ -1,5 +1,5 @@
 
---= Ambience lite by TenPlus1 (1st April 2016)
+--= Ambience lite by TenPlus1 (6th June 2016)
 
 local max_frequency_all = 1000 -- larger number means more frequent sounds (100-2000)
 local SOUNDVOLUME = 1
@@ -8,6 +8,7 @@ local ambiences
 local played_on_start = false
 
 -- sound sets
+
 local night = {
 	handler = {}, frequency = 40,
 	{name = "hornedowl", length = 2},
@@ -46,7 +47,8 @@ local beach = {
 	handler = {}, frequency = 40,
 	{name = "seagull", length = 4.5},
 	{name = "beach", length = 13},
-	{name = "gull", length = 1}
+	{name = "gull", length = 1},
+	{name = "beach_2", length = 6},
 }
 
 local desert = {
@@ -86,14 +88,20 @@ local largefire = {
 }
 
 local jungle = {
-	handler = {}, frequency = 60,
-	{name = "jungle", length = 4},
+	handler = {}, frequency = 200,
+	{name = "jungle_day_1", length = 7},
 	{name = "deer", length = 7},
 	{name = "canadianloon2", length = 14},
 	{name = "bird1", length = 11},
-	{name = "bird2", length = 6},
 	{name = "peacock", length = 2},
-	{name = "bluejay", length = 6},
+}
+
+local jungle_night = {
+	handler = {}, frequency = 200,
+	{name = "jungle_night_1", length = 4},
+	{name = "jungle_night_2", length = 4},
+	{name = "deer", length = 7},
+	{name = "frog", length = 1},
 }
 
 local radius = 6
@@ -104,7 +112,7 @@ local num_fire, num_lava, num_water_flowing, num_water_source,
 local get_ambience = function(player)
 
 	-- who and where am I?
-	local player_name = player:get_player_name()
+	--local player_name = player:get_player_name()
 	local pos = player:getpos()
 
 	-- what is around me?
@@ -118,11 +126,13 @@ local get_ambience = function(player)
 
 --= START Ambiance
 
-	if minetest.get_item_group(nod_head, "water") > 0 then
+	if minetest.registered_nodes[nod_head]
+	and minetest.registered_nodes[nod_head].groups.water then
 		return {underwater = underwater}
 	end
 
-	if minetest.get_item_group(nod_feet, "water") > 0 then
+	if minetest.registered_nodes[nod_feet]
+	and minetest.registered_nodes[nod_feet].groups.water then
 		return {splash = splash}
 	end
 
@@ -203,6 +213,11 @@ print (
 
 		return {day = day}
 	else
+
+		if num_jungletree > 100 then
+			return {jungle_night = jungle_night}
+		end
+
 		return {night = night}
 	end
 
@@ -215,9 +230,10 @@ local play_sound = function(player_name, list, number)
 
 	if list.handler[player_name] == nil then
 
-		local gain = volume * SOUNDVOLUME
-		local handler = minetest.sound_play(list[number].name,
-			{to_player = player_name, gain = gain})
+		local handler = minetest.sound_play(list[number].name, {
+			to_player = player_name,
+			gain = volume * SOUNDVOLUME
+		})
 
 		if handler then
 
@@ -272,6 +288,7 @@ local still_playing = function(still_playing, player_name)
 	if not still_playing.smallfire then stop_sound(smallfire, player_name) end
 	if not still_playing.largefire then stop_sound(largefire, player_name) end
 	if not still_playing.jungle then stop_sound(jungle, player_name) end
+	if not still_playing.jungle_night then stop_sound(jungle_night, player_name) end
 end
 
 -- player routine
@@ -283,13 +300,15 @@ minetest.register_globalstep(function(dtime)
 	if timer < 1 then return end
 	timer = 0
 
-	for _,player in pairs(minetest.get_connected_players()) do
+	local players = minetest.get_connected_players()
 
-		local player_name = player:get_player_name()
+	for n = 1, #players do
+
+		local player_name = players[n]:get_player_name()
 
 --local t1 = os.clock()
 
-		ambiences = get_ambience(player)
+		ambiences = get_ambience(players[n])
 
 --print(string.format("elapsed time: %.4f\n", os.clock() - t1))
 

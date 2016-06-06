@@ -1,20 +1,3 @@
---------------Music Lic:
-Amethystium:
---Avalon
---Ethereal
---Faraway
---Strangely Beautiful
-
-"I can't give you a formal license (legal paperwork) for it, but as long as it's non-commercial I can give you my personal blessing and guarantee that you won't get in trouble for using it :) If that's enough just feel free to use any of my tracks. Please credit the music properly though, and include a link to www.amethystium.com and www.am.mu (it's the same site right now, but the latter will be a label/music store site soon).
-Best regards,
-Øystein Ramfjord"
-
-Jordach:
---dark_ambiance
---eastern_feeling
-These sounds are used for the Mod for Minetest; Ambiance.
-The included sounds are http://creativecommons.org/licenses/by-nc-sa/3.0/ 
-Not Used:--mtest
 
 -----------Sound Lic:
 --Nightime Sound, Recorded by Mike Koenig, License: Attribution 3.0 http://soundbible.com/951-Nightime.html
@@ -114,5 +97,7 @@ Creative Commons : Attribution-Noncommercial-Share Alike 3.0
 http://www.jamendo.com/en/track/904012/dance-of-magical-flowers
 http://www.jamendo.com/en/track/904013/magic-of-the-seventh-world
 http://www.jamendo.com/en/track/904016/in-search-of-the-soul
+
+http://www.freesfx.co.uk/soundeffects/forests-jungles/
 
 zero-project
