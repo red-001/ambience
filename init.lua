@@ -1,5 +1,5 @@
 
---= Ambience lite by TenPlus1 (6th June 2016)
+--= Ambience lite by TenPlus1 (13th June 2016)
 
 local max_frequency_all = 1000 -- larger number means more frequent sounds (100-2000)
 local SOUNDVOLUME = 1
@@ -131,9 +131,13 @@ local get_ambience = function(player)
 		return {underwater = underwater}
 	end
 
-	if minetest.registered_nodes[nod_feet]
-	and minetest.registered_nodes[nod_feet].groups.water then
-		return {splash = splash}
+	if minetest.registered_nodes[nod_feet].groups.water then
+
+		local control = player:get_player_control()
+
+		if control.up or control.down or control.left or control.right then
+			return {splash = splash}
+		end
 	end
 
 	local ps, cn = minetest.find_nodes_in_area(
