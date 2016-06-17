@@ -1,11 +1,10 @@
 
---= Ambience lite by TenPlus1 (13th June 2016)
+--= Ambience lite by TenPlus1 (17th June 2016)
 
 local max_frequency_all = 1000 -- larger number means more frequent sounds (100-2000)
 local SOUNDVOLUME = 1
 local volume = 0.3
 local ambiences
-local played_on_start = false
 
 -- sound sets
 
@@ -77,6 +76,11 @@ local lava = {
 	{name = "lava", length = 7}
 }
 
+local river = {
+	handler = {}, frequency = 1000,
+	{name = "river", length = 4}
+}
+
 local smallfire = {
 	handler = {}, frequency = 1000,
 	{name = "fire_small", length = 6}
@@ -106,7 +110,7 @@ local jungle_night = {
 
 local radius = 6
 local num_fire, num_lava, num_water_flowing, num_water_source,
-	num_desert, num_snow, num_jungletree
+	num_desert, num_snow, num_jungletree, num_river
 
 -- check where player is and which sounds are played
 local get_ambience = function(player)
@@ -153,11 +157,12 @@ local get_ambience = function(player)
 
 	num_fire = (cn["fire:basic_flame"] or 0) + (cn["fire:permanent_flame"] or 0)
 	num_lava = (cn["default:lava_flowing"] or 0) + (cn["default:lava_source"] or 0)
-	num_water_flowing = (cn["default:water_flowing"] or 0) + (cn["default:river_water_flowing"] or 0)
-	num_water_source = (cn["default:water_source"] or 0) + (cn["default:river_water_flowing"] or 0)
+	num_water_flowing = (cn["default:water_flowing"] or 0)
+	num_water_source = (cn["default:water_source"] or 0)
 	num_desert = (cn["default:desert_sand"] or 0) + (cn["default:desert_stone"] or 0)
 	num_snow = (cn["default:snowblock"] or 0)
 	num_jungletree = (cn["default:jungletree"] or 0)
+	num_river = (cn["default:river_water_source"] or 0) + (cn["default:river_water_flowing"] or 0)
 --[[
 print (
 	"fr:" .. num_fire,
@@ -186,6 +191,10 @@ print (
 
 	if num_water_flowing > 30 then
 		return {flowing_water = flowing_water}
+	end
+
+	if num_river > 30 then
+		return {river = river}
 	end
 
 	if pos.y < 7 and pos.y > 0
@@ -265,12 +274,6 @@ local stop_sound = function (list, player_name)
 
 	if list.handler[player_name] then
 
-		if list.on_stop then
-
-			minetest.sound_play(list.on_stop,
-				{to_player = player_name, gain = SOUNDVOLUME})
-		end
-
 		minetest.sound_stop(list.handler[player_name])
 
 		list.handler[player_name] = nil
@@ -279,7 +282,7 @@ end
 
 -- check sounds that are not in still_playing
 local still_playing = function(still_playing, player_name)
-	if not still_playing.cave then 	stop_sound(cave, player_name) end
+	if not still_playing.cave then stop_sound(cave, player_name) end
 	if not still_playing.high_up then stop_sound(high_up, player_name) end
 	if not still_playing.beach then stop_sound(beach, player_name) end
 	if not still_playing.desert then stop_sound(desert, player_name) end
@@ -288,6 +291,7 @@ local still_playing = function(still_playing, player_name)
 	if not still_playing.flowing_water then stop_sound(flowing_water, player_name) end
 	if not still_playing.splash then stop_sound(splash, player_name) end
 	if not still_playing.underwater then stop_sound(underwater, player_name) end
+	if not still_playing.river then stop_sound(river, player_name) end
 	if not still_playing.lava then stop_sound(lava, player_name) end
 	if not still_playing.smallfire then stop_sound(smallfire, player_name) end
 	if not still_playing.largefire then stop_sound(largefire, player_name) end
@@ -296,7 +300,9 @@ local still_playing = function(still_playing, player_name)
 end
 
 -- player routine
+
 local timer = 0
+
 minetest.register_globalstep(function(dtime)
 
 	-- every 1 second
@@ -322,17 +328,6 @@ minetest.register_globalstep(function(dtime)
 
 			if math.random(1, 1000) <= ambience.frequency then
 
-				if ambience.on_start
-				and played_on_start == false then
-
-					played_on_start = true
-
-					minetest.sound_play(ambience.on_start, {
-						to_player = player_name,
-						gain = SOUNDVOLUME
-					})
-				end
-
 				play_sound(player_name, ambience, math.random(1, #ambience))
 			end
 		end
@@ -344,8 +339,14 @@ minetest.register_chatcommand("svol", {
 	params = "<svol>",
 	description = "set sound volume (0.1 to 1.0)",
 	privs = {server = true},
+
 	func = function(name, param)
-		SOUNDVOLUME = param
-		minetest.chat_send_player(name, "Sound volume set.")
+
+		SOUNDVOLUME = tonumber(param) or SOUNDVOLUME
+
+		if SOUNDVOLUME < 0.1 then SOUNDVOLUME = 0.1 end
+		if SOUNDVOLUME > 1.0 then SOUNDVOLUME = 1.0 end
+
+		return true, "Sound volume set to " .. SOUNDVOLUME
 	end,
 })
