@@ -1,10 +1,16 @@
 
---= Ambience lite by TenPlus1 (17th June 2016)
+--= Ambience lite by TenPlus1 (23rd December 2016)
 
 local max_frequency_all = 1000 -- larger number means more frequent sounds (100-2000)
 local SOUNDVOLUME = 1
 local volume = 0.3
 local ambiences
+
+-- override default water sounds
+minetest.override_item("default:water_source", { sounds = {} })
+minetest.override_item("default:water_flowing", { sounds = {} })
+minetest.override_item("default:river_water_source", { sounds = {} })
+minetest.override_item("default:river_water_flowing", { sounds = {} })
 
 -- sound sets
 
