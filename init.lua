@@ -1,9 +1,8 @@
 
---= Ambience lite by TenPlus1 (23rd December 2016)
+--= Ambience lite by TenPlus1 (24th December 2016)
 
 local max_frequency_all = 1000 -- larger number means more frequent sounds (100-2000)
-local SOUNDVOLUME = 1
-local volume = 0.3
+local SOUNDVOLUME = 1.0
 local ambiences
 
 -- override default water sounds
@@ -12,12 +11,12 @@ minetest.override_item("default:water_flowing", { sounds = {} })
 minetest.override_item("default:river_water_source", { sounds = {} })
 minetest.override_item("default:river_water_flowing", { sounds = {} })
 
--- sound sets
+-- sound sets (gain defaults to 0.3 unless specifically set)
 
 local night = {
 	handler = {}, frequency = 40,
 	{name = "hornedowl", length = 2},
-	{name = "wolves", length = 4},
+	{name = "wolves", length = 4, gain = 0.4},
 	{name = "cricket", length = 6},
 	{name = "deer", length = 7},
 	{name = "frog", length = 1},
@@ -74,7 +73,7 @@ local underwater = {
 
 local splash = {
 	handler = {}, frequency = 1000,
-	{name = "swim_splashing", length=3},
+	{name = "swim_splashing", length = 3},
 }
 
 local lava = {
@@ -94,7 +93,7 @@ local smallfire = {
 
 local largefire = {
 	handler = {}, frequency = 1000,
-	{name = "fire_large", length = 8}
+	{name = "fire_large", length = 8, gain = 0.8}
 }
 
 local jungle = {
@@ -251,7 +250,7 @@ local play_sound = function(player_name, list, number)
 
 		local handler = minetest.sound_play(list[number].name, {
 			to_player = player_name,
-			gain = volume * SOUNDVOLUME
+			gain = (list[number].gain or 0.3) * SOUNDVOLUME
 		})
 
 		if handler then
