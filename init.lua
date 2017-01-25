@@ -113,11 +113,6 @@ local jungle_night = {
 	{name = "frog", length = 1},
 }
 
-local void = {
-	handler = {}, frequency = 1000,
-	{name = "fire_large", length = 8, gain = 0.8}
-}
-
 local radius = 6
 local num_fire, num_lava, num_water_flowing, num_water_source, num_air,
 	num_desert, num_snow, num_jungletree, num_river, num_obsidian
@@ -162,8 +157,7 @@ local get_ambience = function(player)
 			"default:lava_flowing", "default:lava_source", "default:jungletree",
 			"default:water_flowing", "default:water_source",
 			"default:river_water_flowing", "default:river_water_source",
-			"default:desert_sand", "default:desert_stone", "default:snowblock",
-			"default:obsidian", "air"
+			"default:desert_sand", "default:desert_stone", "default:snowblock"
 		})
 
 	num_fire = (cn["fire:basic_flame"] or 0) + (cn["fire:permanent_flame"] or 0)
@@ -174,8 +168,7 @@ local get_ambience = function(player)
 	num_snow = (cn["default:snowblock"] or 0)
 	num_jungletree = (cn["default:jungletree"] or 0)
 	num_river = (cn["default:river_water_source"] or 0) + (cn["default:river_water_flowing"] or 0)
-	num_obsidian = (cn["default:obsidian"] or 0)
-	num_air = (cn["air"] or 0)
+
 --[[
 print (
 	"fr:" .. num_fire,
@@ -214,10 +207,6 @@ print ("---", num_obsidian, num_air)
 	if pos.y < 7 and pos.y > 0
 	and num_water_source > 100 then
 		return {beach = beach}
-	end
-
-	if num_obsidian > 10 and num_air > 2000 then
-		return {void = void}
 	end
 
 	if num_desert > 150 then
@@ -315,7 +304,6 @@ local still_playing = function(still_playing, player_name)
 	if not still_playing.largefire then stop_sound(largefire, player_name) end
 	if not still_playing.jungle then stop_sound(jungle, player_name) end
 	if not still_playing.jungle_night then stop_sound(jungle_night, player_name) end
-	if not still_playing.void then stop_sound(void, player_name) end
 end
 
 -- player routine
@@ -335,11 +323,11 @@ minetest.register_globalstep(function(dtime)
 
 		local player_name = players[n]:get_player_name()
 
-local t1 = os.clock()
+--local t1 = os.clock()
 
 		ambiences = get_ambience(players[n])
 
-print(string.format("elapsed time: %.4f\n", os.clock() - t1))
+--print(string.format("elapsed time: %.4f\n", os.clock() - t1))
 
 		still_playing(ambiences, player_name)
 
