@@ -180,7 +180,7 @@ print (
 	"jt:" .. num_jungletree
 )
 ]]
-print ("---", num_obsidian, num_air)
+
 	-- is fire redo mod active?
 	if fire and fire.mod and fire.mod == "redo" then
 
